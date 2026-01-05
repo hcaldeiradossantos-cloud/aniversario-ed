@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Cartão</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #0d1a44, #020814);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* ===== CENA ===== */
+.scene {
+  position: relative;
+  width: 420px;
+  height: 560px;
+}
+
+/* ===== TEXTO ===== */
+.texto-fogos {
+  position: fixed;
+  top: 22%;
+  width: 100%;
+  text-align: center;
+  font-family: 'Great Vibes', cursive;
+  font-size: 90px;
+  background: linear-gradient(
+    120deg,
+    #fff6c7,
+    #f1c96b,
+    #b8891d,
+    #f7dc8b
+  );
+  background-size: 300% 300%;
+  animation: brilho 3.5s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0;
+  transition: opacity 2s;
+  z-index: 10;
+}
+.texto-fogos.mostrar { opacity: 1; }
+
+@keyframes brilho {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+/* ===== BOLO ===== */
+.bolo {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.andar {
+  background: #fff2a8;
+  border-radius: 24px;
+  margin: auto;
+  position: relative;
+}
+
+.topo { width: 200px; height: 90px; }
+.base { width: 280px; height: 120px; margin-top: -14px; }
+
+.cobertura {
+  position: absolute;
+  top: -12px;
+  left: 0;
+  width: 100%;
+  height: 26px;
+  background: #ff00d0;
+  border-radius: 24px 24px 18px 18px;
+}
+
+
+.bolinhas {
+  position: absolute;
+  bottom: 119px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 50px;
+}
+
+.bolinha {
+  width: 10px;
+  height: 10px;
+  background: #e04b4b;
+  border-radius: 50%;
+}
+
+/* ===== PRATO ===== */
+.prato {
+  width: 320px;
+  height: 28px;
+  background: radial-gradient(circle at center, #ffffff, #e6e6f0);
+  border-radius: 50%;
+  margin-top: -6px;
+  box-shadow: inset 0 -5px rgba(0,0,0,0.15);
+}
+
+/* ===== VELAS ===== */
+.velas {
+  position: absolute;
+  bottom: 300px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 40px;
+  cursor: pointer;
+}
+
+.vela {
+  width: 14px;
+  height: 80px;
+  background: repeating-linear-gradient(
+    45deg,
+    #f7c6c6,
+    #f7c6c6 6px,
+    #ffffff 6px,
+    #ffffff 12px
+  );
+  border-radius: 8px;
+  position: relative;
+}
+
+.chama {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 26px;
+  background: radial-gradient(circle, #fff6a0, #ffb300, #ff6a00);
+  border-radius: 50%;
+  box-shadow: 0 0 30px 14px rgba(255,200,80,0.9);
+}
+
+/* ===== IMAGENS ===== */
+.final {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
+
+.final img {
+  max-width: 90%;
+  max-height: 90%;
+  cursor: pointer;
+}
+
+/* CANVAS */
+canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* RESPONSIVO */
+@media (max-width: 480px) {
+  .scene { transform: scale(0.65); }
+  .texto-fogos { font-size: 48px; }
+}
+</style>
+</head>
+
+<body>
+
+<audio id="musica" src="aniversarioe.mp3"></audio>
+
+<div class="scene">
+
+  <div class="velas" id="gatilho">
+    <div class="vela"><div class="chama"></div></div>
+    <div class="vela"><div class="chama"></div></div>
+    <div class="vela"><div class="chama"></div></div>
+  </div>
+
+  <div class="bolo">
+    <div class="andar topo">
+      <div class="cobertura"></div>
+    </div>
+
+    <div class="andar base">
+      <div class="cobertura"></div>
+      <div class="bolinhas">
+        <div class="bolinha"></div>
+        <div class="bolinha"></div>
+        <div class="bolinha"></div>
+        <div class="bolinha"></div>
+        <div class="bolinha"></div>
+      </div>
+    </div>
+
+    <div class="prato"></div>
+  </div>
+</div>
+
+<div class="texto-fogos" id="textoFogos">
+  Feliz<br>Aniversário
+</div>
+
+<div class="final" id="img1"><img src="cartafechada.png"></div>
+<div class="final" id="img2"><img src="cartaaberta.png"></div>
+
+<canvas id="fogos"></canvas>
+
+<script>
+const canvas = document.getElementById("fogos");
+const ctx = canvas.getContext("2d");
+const textoFogos = document.getElementById("textoFogos");
+const musica = document.getElementById("musica");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let foguetes = [];
+let particulas = [];
+
+document.getElementById("gatilho").onclick = () => {
+  musica.play();
+  textoFogos.classList.add("mostrar");
+
+  setInterval(() => {
+    foguetes.push({
+      x: Math.random() * canvas.width,
+      y: canvas.height,
+      vy: -4
+    });
+  }, 900);
+
+  animar();
+
+  setTimeout(() => {
+    document.getElementById("img1").style.display = "flex";
+  }, 7000);
+};
+
+function explodir(x, y) {
+  for (let i = 0; i < 50; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const v = Math.random() * 2 + 0.8;
+    particulas.push({ x, y, vx: Math.cos(a)*v, vy: Math.sin(a)*v, life: 80 });
+  }
+}
+
+function animar() {
+  ctx.fillStyle = "rgba(0,0,0,0.25)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  foguetes.forEach((f,i)=>{
+    f.y += f.vy;
+    f.vy += 0.05;
+    ctx.fillStyle = "rgba(255,220,160,0.9)";
+    ctx.fillRect(f.x,f.y,2,6);
+    if(f.vy>-0.5){
+      explodir(f.x,f.y);
+      foguetes.splice(i,1);
+    }
+  });
+
+  particulas.forEach((p,i)=>{
+    p.x+=p.vx;
+    p.y+=p.vy;
+    p.life--;
+    ctx.fillStyle = "rgba(255,210,140,0.8)";
+    ctx.fillRect(p.x,p.y,3,3);
+    if(p.life<=0) particulas.splice(i,1);
+  });
+
+  requestAnimationFrame(animar);
+}
+
+document.getElementById("img1").onclick = ()=>{
+  document.getElementById("img1").style.display="none";
+  document.getElementById("img2").style.display="flex";
+};
+</script>
+
+</body>
+</html>
